@@ -1,0 +1,23 @@
+{
+  "name": "imdb-scraper",
+  "version": "0.0.1",
+  "description": "Just...a scraper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scrape": "node scraper.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brochington/imdb-scraper.git"
+  },
+  "author": "Broch Stilley <brochington@gmail.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/brochington/imdb-scraper/issues"
+  },
+  "homepage": "https://github.com/brochington/imdb-scraper#readme",
+  "devDependencies": {
+    "playwright": "^1.12.3"
+  }
+}
