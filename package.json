@@ -1,10 +1,9 @@
 {
   "name": "imdb-scraper",
   "version": "0.0.1",
-  "description": "Just...a scraper",
+  "description": "An IMDB scraper to extract filmmaker data",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "scrape": "node scraper.mjs"
   },
   "repository": {
@@ -19,5 +18,8 @@
   "homepage": "https://github.com/brochington/imdb-scraper#readme",
   "devDependencies": {
     "playwright": "^1.12.3"
+  },
+  "dependencies": {
+    "fs-extra": "^10.0.0"
   }
 }
