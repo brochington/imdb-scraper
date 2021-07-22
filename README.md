@@ -1,5 +1,7 @@
 # IMDB Scraper
 
+__NOTE: Make sure you are on an updated version of either Chrome or Firefox (tested with Chrome 91)__
+
 The scripts within this project will assist in extracting filmmaker information from IMDB.
 
 This project contains two methods:
