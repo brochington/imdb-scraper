@@ -2,36 +2,31 @@ import { chromium } from 'playwright';
 import fs from 'fs/promises';
 
 const showPages = [
-  'https://pro.imdb.com/title/tt10359446',
-  'https://pro.imdb.com/title/tt11744632',
-  'https://pro.imdb.com/title/tt11822998',
-  'https://pro.imdb.com/title/tt8289930',
-  'https://pro.imdb.com/title/tt8784324',
-  'https://pro.imdb.com/title/tt7907916',
-  'https://pro.imdb.com/title/tt7889220',
-  'https://pro.imdb.com/title/tt11823088',
-  'https://pro.imdb.com/title/tt11823076', // Tiger King
-  'https://pro.imdb.com/title/tt8893550',
-  'https://pro.imdb.com/title/tt11958942',
-  'https://pro.imdb.com/title/tt6987788',
-  'https://pro.imdb.com/title/tt8914684',
-  'https://pro.imdb.com/title/tt11958922',
-  'https://pro.imdb.com/title/tt12004280',
-  'https://pro.imdb.com/title/tt12176398',
-  'https://pro.imdb.com/title/tt12027008',
-  'https://pro.imdb.com/title/tt11718294',
-  'https://pro.imdb.com/title/tt12189310',
-  'https://pro.imdb.com/title/tt9846284',
-  'https://pro.imdb.com/title/tt8784324',
-  'https://pro.imdb.com/title/tt9498102',
-  'https://pro.imdb.com/title/tt11963042',
-  'https://pro.imdb.com/title/tt8425308',
-  'https://pro.imdb.com/title/tt12200714',
-  'https://pro.imdb.com/title/tt11958648',
-  'https://pro.imdb.com/title/tt12845620',
-  'https://pro.imdb.com/title/tt12312250',
-  'https://pro.imdb.com/title/tt7752034',
-  'https://pro.imdb.com/title/tt7259746',
+  'https://pro.imdb.com/title/tt11061808/?ref_=instant_tt_1&q=tough%20as%20nails',
+  'https://pro.imdb.com/title/tt4458594/?ref_=instant_tt_1&q=Blaze%20and%20the%20Monster',
+  'https://pro.imdb.com/title/tt12844622/?ref_=instant_tt_1&q=Santiago%20of%20',
+  'https://pro.imdb.com/title/tt11833388/?ref_=instant_tt_1&q=Danger%20Force',
+  'https://pro.imdb.com/title/tt11853378/?ref_=instant_tt_1&q=Side%20Hustle',
+  'https://pro.imdb.com/title/tt0176095/?ref_=instant_tt_1&q=Challenge',
+  'https://pro.imdb.com/title/tt1566154/?ref_=instant_tt_1&q=Teen%20Mom%20OG',
+  'https://pro.imdb.com/title/tt9698572/?ref_=instant_tt_1&q=Double%20Shot%20at%20L',
+  'https://pro.imdb.com/title/tt1820166/?ref_=instant_tt_1&q=Ridiculousness',
+  'https://pro.imdb.com/title/tt2498968/?ref_=instant_tt_1&q=Catfish',
+  'https://pro.imdb.com/title/tt7577814/?ref_=instant_tt_1&q=Floribama',
+  'https://pro.imdb.com/title/tt1865740/?ref_=instant_tt_1&q=Ink%20Master',
+  'https://pro.imdb.com/title/tt1863526/?ref_=instant_tt_1&q=Bar%20Rescue',
+  'https://pro.imdb.com/title/tt2224452/?ref_=instant_tt_3&q=Love%20and%20Hi',
+  'https://pro.imdb.com/title/tt1718437/?ref_=instant_tt_1&q=Love%20and%20Hip%20Hop%20N',
+  'https://pro.imdb.com/title/tt5965978/?ref_=instant_tt_1&q=Black%20Ink%20Crew',
+  'https://pro.imdb.com/title/tt2738096/?ref_=instant_tt_2&q=Black%20Ink%20Crew',
+  'https://pro.imdb.com/title/tt0472989/?ref_=instant_tt_1&q=Wild%20n',
+  'https://pro.imdb.com/title/tt10580092/?ref_=instant_tt_1&q=The%20Oval',
+  'https://pro.imdb.com/title/tt10752770/?ref_=instant_tt_1&q=Sistas',
+  'https://pro.imdb.com/title/tt10525048/?ref_=instant_tt_2&q=Bigger',
+  'https://pro.imdb.com/title/tt11306366/?ref_=instant_tt_1&q=Ruthless',
+  'https://pro.imdb.com/title/tt8115582/?ref_=instant_tt_1&q=Twenties',
+  'https://pro.imdb.com/title/tt8319644/?ref_=instant_tt_1&q=Games%20People',
+  'https://pro.imdb.com/title/tt0115147/?ref_=instant_tt_2&q=The%20Daily%20Show',
 ];
 
 (async () => {
@@ -58,9 +53,14 @@ const showPages = [
 
   await page.waitForTimeout(15000);
 
+  const episodesUrls = showPages
+    .map(sp => sp.split('?')[0])
+    .map(sp => sp.endsWith('/') ? sp.substring(0, sp.length - 1) : sp)
+    .map(sp => `${sp}/episodes`);
+
   // Cycle through shows
-  for (let showPage of showPages) {
-    await page.goto(showPage + '/episodes');
+  for (let episodesUrl of episodesUrls) {
+    await page.goto(episodesUrl);
 
     const episodeUrls = await page.evaluate(() => {
       const urls = [
@@ -79,7 +79,7 @@ const showPages = [
     for (let episodeUrl of episodeUrls) {
       await page.goto(episodeUrl);
 
-      const { csv, showName, episodeInfo } = await page.evaluate(() => {
+      const { csv, showName, epName, epInfo, seasonNum, epNum } = await page.evaluate(() => {
         const csv = [
           ...document.querySelectorAll('[data-a-name="filmmakers"] tbody'),
         ]
@@ -130,15 +130,27 @@ const showPages = [
           '#title_heading > h1 > span > a'
         ).innerText;
 
-        const episodeInfo = document
-          .querySelector('#title_heading > div.a-row.a-spacing-micro')
+        const epName = document.querySelector('#title_heading > span.a-size-medium')?.innerText;
+
+        const epInfo = document
+          .querySelector(
+            '#title_heading > div.a-row.a-spacing-micro, #title_heading > div.a-row.a-spacing-top-micro'
+          )
           .innerText.replaceAll('/', '|');
 
-        return { csv, showName, episodeInfo };
+        const [seasonNum, epNum] = document
+          .querySelector('#title_heading')
+          ?.innerText.match(/((?!Season\s)\d+)|((?!Episode\s\d+))/g)
+          .filter((a) => !!a);
+
+        return { csv, showName, epName, epInfo, seasonNum, epNum };
       });
 
+      let fileName = `${showName}:S${seasonNum}E${epNum}-${epName}.csv`.replaceAll('/', '|');
+      console.log(filename);
+
       // Write CSV files
-      await fs.writeFile(`exports/${showName}: ${episodeInfo}.csv`, csv);
+      await fs.writeFile(`exports/${fileName}`, csv);
     }
   }
 
